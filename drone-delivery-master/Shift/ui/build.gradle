@@ -1,0 +1,54 @@
+plugins {
+    id 'base'
+    id 'com.moowork.node' version '1.2.0'
+}
+
+node {
+    // Version of node to use.
+    version = '8.11.3'
+    // Version of Yarn to use.
+    yarnVersion = '1.7.0'
+    // Base URL for fetching node distributions (change if you have a mirror).
+    distBaseUrl = 'https://nodejs.org/dist'
+    // If true, it will download node using above parameters.
+    // If false, it will try to use globally installed node.
+    download = true
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/nodejs")
+    // Set the work directory for Yarn
+    yarnWorkDir = file("${project.buildDir}/yarn")
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = file("${project.projectDir}")
+}
+
+yarn_run_start {
+    doFirst {
+        environment = [APP_REST_URL: "http://localhost:8080/"]
+    }
+}
+
+jar.dependsOn 'yarn_run_release'
+
+jar {
+    inputs.file("yarn.lock")
+    inputs.file("package.json")
+    inputs.file("webpack.config.js")
+    inputs.file("polyfills.ts")
+    inputs.file("tsconfig.json")
+    inputs.dir("app")
+
+    outputs.dir("${project.buildDir}/webpack")
+
+    from "${project.buildDir}/webpack" into "static"
+}
+
+clean { doLast { delete 'node_modules' } }
+
+tasks.all { Task tsk ->
+    switch ( tsk ) {
+        case YarnTask:
+            // note: what looks like assignment is actually a putAll (!!)...
+            tsk.doFirst { environment = [ BUILD_DIR: "${buildDir}/webpack" ] }
+            tsk.logging.captureStandardOutput LogLevel.INFO
+            tsk.logging.captureStandardError LogLevel.INFO
+            logger.info( 'logging captured from {} ({})', tsk, tsk.class.simpleName ) } }

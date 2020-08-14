@@ -1,0 +1,19 @@
+<div class="c-strlength">
+  <form autocomplete="off">
+    <div class="form-group">
+      <label for="serverPaths">Enter a Path to Search For</label>
+      <input id="serverPaths" name="serverPaths" class="form-control"
+             [(ngModel)]="inputString" (ngModelChange)="inputChange($event)"/>
+    </div>
+  </form>
+
+  <div *ngIf="paths">
+    Retrieved Paths
+    <div *ngFor="let path of paths">
+      {{path}}
+    </div>
+  </div>
+</div>
+
+
+<router-outlet></router-outlet>

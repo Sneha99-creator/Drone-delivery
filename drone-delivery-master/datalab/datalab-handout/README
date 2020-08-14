@@ -1,0 +1,164 @@
+The CS:APP Data Lab
+Directions to Students
+
+Your goal is to modify your copy of bits.c so that each function
+produces correct output for any possible input.
+
+
+*********
+0. Files:
+*********
+
+bits.c		The file you will be modifying and handing in
+
+Various files used by the programs that evaluate your bits.c file:
+bddcheck/	Directory containing code to perform formal verification
+bits.h		Header file that defiles prototypes of functions in bits.c
+btest.c         The btest test harness program
+btest.h         The btest header file.
+decl.c          Used to build btest.
+dlc*      	Data lab rule-checking compiler binary	 
+Driverhdrs.pm   Used by driver.pl
+Driverlib.pm    Used by driver.pl
+driver.pl*      Driver program that evaluates bits.c 
+Makefile	Builds the btest binary.	
+README		This file.
+tests.c		Used to build btest and to define functions for bddcheck/
+
+***********************************************************
+1. Modifying bits.c and checking it for compliance with dlc
+***********************************************************
+
+Carefully read the instructions in the bits.c file before you
+start. These give the coding rules that you will need to follow if you
+want full credit.
+
+Use the dlc compiler (./dlc) to automatically check your version of
+bits.c for compliance with the coding rules:
+
+	unix> ./dlc bits.c
+
+dlc returns silently if there are no problems with your code.
+Otherwise it prints messages that flag any problems.  Once you have a
+legal solution, you can test it for correctness using the ./btest
+program.
+
+Running with the -e switch:
+
+	unix> ./dlc -e bits.c  
+
+causes dlc to print counts of the number of operators used by each function.
+
+********************************************
+2. Testing bits.c for correctness with btest
+********************************************
+
+The Makefile in this directory compiles your version of bits.c with
+additional code to create a program (or test harness) named btest.
+
+Give the command:
+
+	unix> make btest
+
+to compile the code. Run the program with the command:
+
+	unix> ./btest [optional command line args]
+
+When moving from one platform to another (e.g., Linux to Solaris), 
+you will need to get rid of the old version of btest and generate 
+a new one.  Use the commands:
+
+	unix> make clean
+	unix> make btest
+
+*******************
+3. What btest does
+*******************
+
+Btest tests your procedures for correctness by running a number of
+test cases.  It does not guarantee exhaustive evaluation.  In
+addition, it does not check your code for compliance with the coding
+guidelines.  Use dlc to do that.
+
+If you think the functions provided in btest are incorrect send mail
+to the lead person for this assignment.
+
+Here are the command line options for btest:
+   -e N     Limit number of errors to report for single function to N
+            (Default unbounded)
+   -f Name  Check only the named function
+   -g       Prints concise report (implies -v 1 and -e 0)
+   -h       Print the list of options
+   -v N     Set verbosity to level N
+            N=0 Only give final scores
+            N=1 Also report individual correctness scores (default)
+
+
+*****************************************************
+4. Formally verifying your code using the BDD checker
+*****************************************************
+
+The code in the directory bddcheck uses Binary Decision Diagrams
+(BDDs) to formally prove that the bit values generated in the output
+word of your function match those of a reference solution (in the file
+tests.c) for ALL possible arguments.  This is a much stronger
+guarantee than is provided by the limited set of tests run by btest.
+
+To check correctness of single function fun:
+
+   unix> bddcheck/check.pl -f fun
+
+To check correctness of all functions:
+
+   unix> bddcheck/check.pl 
+
+When the checking code detects a mismatch, it will generate and
+compile C code to see whether this is a genuine counterexample or
+there is something wrong with our checking code.
+
+The BDD checker is still in its experimental stages.  If you encounter
+either of the following two cases, please email
+Randy.Bryant@cs.cmu.edu the code for the particular function for which
+this occurs:
+
+1. Your code passes the tests of btest, but the BDD checker finds an error.
+2. The BDD checker finds what it thinks is an error, but the compiled test
+   labels it as a "false positive".
+
+One of the limitations of the current BDD checker is that it cannot
+handle functions that call other functions. This means that if you
+want to insert debugging printf statements into bits.c, then you will
+need to use btest instead of the BDD checker. 
+
+
+****************************************
+5. Using driver.pl to evaluate your work 
+****************************************
+
+The driver program driver.pl evaluates your code for correctness (by
+calling the BDD checker) and compliance with the programming rules (by
+calling the dlc rule checking compiler). This is the same program that
+the Autolab system uses to autograde your handin code. To check your
+code with the driver, type:
+
+   unix> ./driver.pl	
+
+You can also use the driver to send your unofficial results to the
+Autolab server for inclusion on the interactive class status Web page.
+If your userid is bovik, then typing
+
+    unix> ./driver.pl -u bovik
+
+evaluates your work and send the results to Autolab.
+
+Important note: The unofficial results reported by the driver are for
+amusement purposes only.  In order to get credit, you will need to
+handin your code using Autolab, where it will be autograded.  You can
+handin as many times as you like.  Autolab saves the code and
+autograder reports for all of your handins.  However, you will receive
+credit only for the last handin. So be sure to check the status of
+your last handin on your Autolab "handin history" page each time you
+handin.
+
+
+
